@@ -1,5 +1,28 @@
+import pandas as pd
 import numpy as np
+import itertools
 from numpy import linalg
+from sklearn import preprocessing
+
+def data_frame_for_task3(columns_to_drop):
+    df = pd.read_csv('happiness.csv')
+    df = df.loc[:, df.columns != 'country']
+    df = df.drop(columns_to_drop, axis=1)
+    return df
+
+def scale(df):
+    minmax_scale = preprocessing.MinMaxScaler().fit(df)
+    df[df.columns] = minmax_scale.transform(df)
+    return df
+
+def create_df_for_all_combinations(df, len):
+    all_combinations = [subset for subset in itertools.combinations(df.columns, len)]
+    all_combinations_df = pd.DataFrame()
+    for c in all_combinations:
+        all_combinations_df = all_combinations_df.append({f: 1 if f in c else 0 for f in df.columns}, ignore_index=True)
+    all_combinations_df['score'] = 0
+    return all_combinations_df   
+
 
 def evaluate_clusters(df, cluster, features, centroid, within_cluster):
     sum=0
