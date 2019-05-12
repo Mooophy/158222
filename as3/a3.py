@@ -8,6 +8,40 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+
+
+def create_df_and_scale_for_task2():
+    df = pd.read_csv('happiness.csv')
+    df = df.loc[:, df.columns != 'country']
+    minmax_scale = preprocessing.MinMaxScaler().fit(df)
+    df[[c for c in df.columns]] = minmax_scale.transform(df)
+    return df
+
+def create_categorical_feature_as_target(df):
+    df['democratic level'] = ['a' if d > 0.7 else 'c' if d < 0.45 else 'b' for d in df['democratic']]
+    democracy = df.copy()
+    democracy = democracy.loc[:, democracy.columns != 'democratic']
+    return democracy
+
+def explore_features(df, feature, ax):           
+    zipped = zip(['a', 'b', 'c'], ('blue', 'red', 'green'))   
+    ax.set_title(feature)
+    for label, color in zipped:
+        ax.hist(df[feature][df['democratic level'] == label], alpha=0.2, color=color, bins=15)
+
+def plot_hists_for_features(df):
+    f, ax = plt.subplots(3, 7, figsize=(36, 16), sharex=True)
+    feature_ax = [(df.columns[i], ax[i//7][i%7]) for i in range(0, len(df.columns) - 1)]  
+
+    for feature, ax in feature_ax:
+        explore_features(df, feature, ax)
+    plt.show()
+
+
+#####################################
+#####################################
+#####################################
+
 def data_frame_for_task3(columns_to_drop):
     df = pd.read_csv('happiness.csv')
     df = df.loc[:, df.columns != 'country']
